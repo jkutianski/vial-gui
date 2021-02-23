@@ -210,7 +210,7 @@ class Keyboard:
         key = (layer, row, col)
         if self.layout[key] != code:
             if code == RESET_KEYCODE:
-                Unlocker.get().perform_unlock(self)
+                Unlocker.unlock(self)
 
             self.usb_send(self.dev, struct.pack(">BBBBH", CMD_VIA_SET_KEYCODE, layer, row, col, code), retries=20)
             self.layout[key] = code
@@ -222,7 +222,7 @@ class Keyboard:
         key = (layer, index, direction)
         if self.encoder_layout[key] != code:
             if code == RESET_KEYCODE:
-                Unlocker.get().perform_unlock(self)
+                Unlocker.unlock(self)
 
             self.usb_send(self.dev, struct.pack(">BBBBBH", CMD_VIA_VIAL_PREFIX, CMD_VIAL_SET_ENCODER,
                                                 layer, index, direction, code), retries=20)
@@ -247,9 +247,7 @@ class Keyboard:
     def save_layout(self):
         """ Serializes current layout to a binary """
 
-        # TODO: increase version before release
-        # TODO: store keyboard UID here as well
-        data = {"version": 0}
+        data = {"version": 1, "uid": self.keyboard_id}
 
         layout = []
         for l in range(self.layers):
@@ -302,7 +300,7 @@ class Keyboard:
         # only do that if it's different from current macros
         macro = base64.b64decode(data["macro"])
         if macro != self.macro:
-            Unlocker.get().perform_unlock(self)
+            Unlocker.unlock(self)
             self.set_macro(macro)
             self.lock()
 
