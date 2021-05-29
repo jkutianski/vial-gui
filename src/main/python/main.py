@@ -61,6 +61,13 @@ if __name__ == '__main__':
 
         linux_keystroke_recorder()
     else:
+        #App single instance
+        try:
+            from tendo import singleton
+            me = singleton.SingleInstance()
+        except:
+            sys.exit(0)
+
         appctxt = ApplicationContext()       # 1. Instantiate ApplicationContext
         init_logger()
         qt_exception_hook = UncaughtHook()
